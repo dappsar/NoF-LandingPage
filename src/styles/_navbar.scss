@@ -1,0 +1,356 @@
+header {
+  background: transparent;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+}
+
+.navbar {
+  height: 10vh;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  position: absolute;
+  gap: 3%;
+  padding: 1%;
+  z-index: 999;
+
+  &__center {
+    margin-right: 10px;
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    width: 50%;
+    &__li {
+      display: flex;
+      justify-content: center;
+      white-space: nowrap;
+      @include tablet {
+        margin-right: 20px;
+      }
+      @include tablet-landscape {
+        margin-right: 15px;
+      }
+      @include desktop {
+        // margin-right: 10px;
+      }
+      @include large-desktop {
+        // margin-right: 130px;
+      }
+      @include extra-large-desktop {
+        // margin-right: 7.5vw;
+      }
+
+      &__noftown {
+        @extend .navbar__button__common;
+        background: #68b346;
+        &:hover {
+          background: #097f40;
+        }
+      }
+
+      &__collections {
+        @extend .navbar__button__common;
+        background: #ffcc1e;
+        &:hover {
+          background: #f4ca41;
+        }
+      }
+
+      &__whitepaper {
+        @extend .navbar__button__common;
+        background: #f60008;
+        &:hover {
+          background: #fc272e;
+        }
+      }
+    }
+  }
+
+  &__right {
+    @extend .corner__common;
+    justify-content: right;
+
+    &__audio {
+      cursor: pointer;
+      background-size: 100% 100%;
+      img {
+        position: relative;
+      }
+      // el not evita el efecto de hover en las ventanas de account e info
+      &:hover > :not(.notification__info):not(.account__info) {
+        transform: scale(1.1);
+        transition: 0.2s;
+      }
+    }
+    &__coin {
+      @extend .navbar__right__audio;
+    }
+    &__account {
+      @extend .navbar__right__audio;
+    }
+    &__notif {
+      @extend .navbar__right__audio;
+      margin-top: 15px !important;
+      position: relative;
+      @media (max-width: 768px) {
+        margin-top: 10px !important;
+      }
+    }
+    &__notif__badge {
+      @extend .navbar__right__audio;
+      position: relative;
+    }
+  }
+
+  &__left {
+    @extend .corner__common;
+    justify-content: left;
+    &__nof {
+      cursor: pointer;
+      background-size: 100% 100%;
+      img {
+        position: relative;
+        width: 120px !important;
+        height: 60px;
+      }
+      &:hover {
+        transform: scale(1.1);
+        transition: 0.2s;
+      }
+    }
+  }
+}
+
+.notification__badge__1 {
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  background-color: #3896ee;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 9px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.notification__badge__2 {
+  @extend .notification__badge__1;
+  width: 30px;
+  height: 30px;
+}
+
+.corner__common {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  width: 25%;
+  gap: 1em;
+  img {
+    width: 60px;
+    height: 60px;
+  }
+  @include mobile {
+    gap: 0.5em;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  @include mobile-landscape {
+    gap: 0.5em;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  @include tablet {
+    gap: 0.5em;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  @include desktop {
+    gap: 0.5em;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  @include large-desktop {
+    margin-top: 0em;
+    gap: 0.5em;
+    width: 60px;
+    height: 60px;
+  }
+}
+
+.link {
+  // world - mundo
+  width: 60px;
+  height: 60px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: scale 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.1);
+    transition: 0.2s;
+  }
+  @include mobile {
+    width: 40px;
+    height: 40px;
+  }
+  @include mobile-landscape {
+    width: 40px;
+    height: 40px;
+  }
+  @include tablet {
+    width: 40px;
+    height: 40px;
+  }
+  @include tablet-landscape {
+    width: 40px;
+    height: 40px;
+  }
+  @include desktop {
+    width: 40px;
+    height: 40px;
+  }
+  @include large-desktop {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+.dropdown {
+  position: relative;
+  z-index: 222;
+}
+
+.dropdown-menu {
+  height: 220px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  background-color: none;
+  opacity: 0;
+  z-index: -10;
+  transform: translateY(-20px);
+  transition:
+    opacity 150ms ease-in-out,
+    transform 150ms ease-in-out;
+}
+
+.dropdown > .link:focus + .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  z-index: 110;
+  display: block;
+}
+
+.language_ul {
+  list-style: none;
+  text-decoration: none;
+  columns: 1;
+}
+
+.language_li {
+  height: 40px;
+}
+
+.lang-btn {
+  border: none;
+  cursor: pointer;
+  background: none;
+  transition: scale 0.2s ease-in-out;
+  &:hover {
+    scale: 1.1;
+  }
+  img {
+    width: 40px;
+    height: 30px;
+  }
+}
+
+.navbar__button__common {
+  font-family: 'Press Start 2P', 'Share Tech Mono', 'Share Tech', sans-serif;
+  font-size: 0.9em;
+  white-space: nowrap;
+  width: 190px;
+  height: 50px;
+  color: #000;
+  border: 0px;
+  position: relative;
+  margin-right: 30px;
+  box-shadow:
+    inset -4px 4px 1px 1px grey,
+    inset -4px -4px 1px 1px lightgray,
+    inset 4px 0px 1px 1px lightgray;
+  @include mobile {
+    display: none;
+  }
+  @include mobile-landscape {
+    display: none;
+  }
+  &:hover {
+    cursor: pointer;
+    color: #fff;
+  }
+  &:active {
+    top: 5px;
+    box-shadow:
+      -4px 4px 1px 1px grey,
+      -4px -4px 1px 1px lightgray,
+      4px 0px 1px 1px lightgray;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    left: -1.5%;
+    top: 0;
+    width: 103%;
+    height: 100%;
+    z-index: -1;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -6%;
+    width: 100%;
+    height: 112%;
+    z-index: -1;
+  }
+  @include tablet {
+    font-size: 0.2em;
+    width: 80px;
+    height: 30px;
+  }
+  @include desktop {
+    font-size: 0.55em;
+    width: 120px;
+    height: 30px;
+    margin-right: 10px;
+  }
+  @include large-desktop {
+    font-size: 0.55em;
+    width: 120px;
+    height: 30px;
+    margin-right: 10px;
+  }
+}
