@@ -1,10 +1,15 @@
-// use web3Modal deprecated
-import { useState, useEffect, createContext, useContext } from 'react'
+// use web3-onboard component
+import { useConnectWallet, useSetChain, useSetLocale, useWallets, init } from '@web3-onboard/react'
+import { createContext, useState, useEffect, useContext, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { ethers } from 'ethers'
-import Web3Modal from 'web3modal'
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
-import WalletConnectProvider from '@walletconnect/web3-provider'
+
+import { useSettingsContext } from '../hooks'
+import coinbaseModule from '@web3-onboard/coinbase'
+import trustModule from '@web3-onboard/trust'
+import gnosisModule from '@web3-onboard/gnosis'
+import walletConnectModule from '@web3-onboard/walletconnect'
+import injectedModule, { ProviderLabel } from '@web3-onboard/injected-wallets'
 
 import daiAbi from './abis/TestDAI.v3.sol/NofTestDAIV3.json'
 import alphaAbi from './abis/Alpha.v3.sol/NofAlphaV3.json'
@@ -12,8 +17,17 @@ import gammaPacksAbi from './abis/GammaPacks.v3.sol/NofGammaPacksV3.json'
 import gammaCardsAbi from './abis/GammaCards.v5.sol/NofGammaCardsV5.json'
 import gammaOffersAbi from './abis/GammaOffers.v4.sol/NofGammaOffersV4.json'
 import { CONTRACTS, NETWORK, WalletConnectProjectId } from '../config'
+
+import brLocales from '../../public/locales/br/web3_onboard.json'
+import enLocales from '../../public/locales/en/web3_onboard.json'
+import esLocales from '../../public/locales/es/web3_onboard.json'
+
 import { NotificationContext } from './NotificationContext'
 import { getAccountAddressText } from '../utils/stringUtils'
+// import { initWeb3Onboard } from './ web3Onboard'
+import useWeb3Onboard from './useWeb3Onboard'
+
+//----------------------------------------------------------
 
 const initialState = {
   connectWallet: () => {},
@@ -23,8 +37,8 @@ const initialState = {
 
 const Web3Context = createContext(initialState)
 
-function Web3ContextProvider({ children }) {
-  const [web3Modal, setWeb3Modal] = useState(null)
+const Web3ContextProvider = ({ children }) => {
+  // const [web3Onboard, setWeb3Onboard] = useState(null)
   const [web3Error, setWeb3Error] = useState('')
   const [wallets, setWallets] = useState(null)
   const [walletAddress, setWalletAddress] = useState(null)
@@ -37,107 +51,229 @@ function Web3ContextProvider({ children }) {
   const [gammaCardsContract, setGammaCardsContract] = useState(null)
   const [gammaOffersContract, setGammaOffersContract] = useState(null)
   const { addNotification } = useContext(NotificationContext)
+  const { languageSetted } = useSettingsContext()
+  let updateLocale = () => {}
 
-  async function requestAccount() {
-    const providerOptions = {
-      injected: {
-        package: null,
-        display: {
-          description: ' '
-        }
-      },
-      coinbasewallet: {
-        package: CoinbaseWalletSDK,
-        display: {
-          description: ' '
+  const { web3Onboard } = useWeb3Onboard()
+
+  /*
+  const initWeb3Onboard = async () => {
+    try {
+      console.log('initWeb3Onboard 1')
+      const wcV1InitOptions = {
+        version: 1,
+        bridge: 'https://bridge.walletconnect.org',
+        qrcodeModalOptions: {
+          mobileLinks: ['metamask', 'argent', 'trust']
         },
-        options: {
-          appName: 'NoF'
+        connectFirstChainId: true
+      }
+      console.log('initWeb3Onboard 2')
+
+      const wcV2InitOptions = {
+        version: 2,
+        projectId: WalletConnectProjectId || ''
+      }
+      console.log('initWeb3Onboard 3')
+
+      const injected = injectedModule({
+        filter: {
+          // allow only on non-android mobile
+          [ProviderLabel.Detected]: ['Android', 'desktop', 'macOS', 'iOS'],
+          displayUnavailable: true
         }
-      },
-      binancechainwallet: {
-        package: true,
-        display: {
-          description: ' '
-        }
-      },
-      walletconnect: {
-        package: WalletConnectProvider,
-        display: {
-          description: ' '
+      })
+      console.log('initWeb3Onboard 4')
+
+      const walletConnect = walletConnectModule(wcV2InitOptions || wcV1InitOptions)
+      console.log('initWeb3Onboard 5')
+
+      const trust = trustModule()
+      console.log('initWeb3Onboard 6')
+      const coinbase = coinbaseModule()
+      console.log('initWeb3Onboard 7')
+      const gnosis = gnosisModule({
+        whitelistedDomains: []
+      })
+      console.log('initWeb3Onboard 8')
+
+      const onboard = init({
+        wallets: [injected, walletConnect, gnosis, coinbase, trust],
+        connect: {
+          showSidebar: true,
+          disableClose: false,
+          autoConnectLastWallet: true,
+          autoConnectAllPreviousWallet: true
         },
-        options: {
-          // version: 2,
-          // clientId: WalletConnectProjectId,
-          rpc: {
-            [parseInt(NETWORK.chainId, 16)]: NETWORK.chainNodeProviderUrl
+        accountCenter: {
+          desktop: {
+            enabled: false,
+            minimal: true,
+            position: 'bottomRight'
           },
-          network: NETWORK.chainName
-          /*{
-          version: 1,
-          qrcodeModalOptions: {
-            mobileLinks: ['metamask', 'trust', 'coinbase', 'argent']
-          },
-          rpc: {
-            [parseInt(NETWORK.chainId, 16)]: NETWORK.chainNodeProviderUrl
+          mobile: {
+            enabled: false,
+            minimal: true,
+            position: 'topRight'
           }
-          }  */
+        },
+        notify: { enabled: true },
+        chains: [
+          {
+            id: NETWORK.chainId,
+            token: NETWORK.chainCurrency,
+            label: NETWORK.chainName,
+            rpcUrl: NETWORK.ChainRpcUrl
+          }
+        ],
+        i18n: {
+          en: enLocales,
+          es: esLocales,
+          br: brLocales
+        },
+        appMetadata: {
+          name: 'NoF',
+          description: 'Number one Fun',
+          icon: '/images/common/nof.png',
+          recommendedInjectedWallets: [
+            {
+              name: 'MetaMask',
+              url: 'https://metamask.io'
+            }
+          ]
+        }
+      })
+      console.log('initWeb3Onboard 9')
+
+      return onboard
+      // setWeb3Onboard(onboard)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+*/
+
+  /*
+  useEffect(() => {
+    initWeb3Onboard().then(() => {})
+  }, [initWeb3Onboard])
+
+  useEffect(() => {
+    if (web3Onboard) {
+      updateLocale = useSetLocale()
+      updateLocale(languageSetted || 'en')
+    }
+  }, [initWeb3Onboard])
+  */
+
+  /*
+  useEffect(() => {
+    setWeb3Onboard(initWeb3Onboard)
+  }, [])
+  */
+
+  const getProvider = (wlt) => {
+    if (wlt) {
+      return new ethers.providers.Web3Provider(wlt.provider, 'any')
+    } else {
+      return new ethers.providers.JsonRpcProvider(
+        NETWORK.ChainRpcUrl,
+        parseInt(NETWORK.chainId, 10)
+      )
+    }
+  }
+
+  /*
+  const connectWallet = useCallback(() => {
+    // const updateLocale = useSetLocale()
+    // updateLocale(languageSetted || 'en')
+
+    web3Onboard
+      .connectWallet()
+      .then((wallets) => {
+        if (wallets) {
+          setWallets(wallets)
+          if (wallets[0]) {
+            setWalletAddress(wallets[0].accounts[0].address)
+            const _chainId = wallets[0]?.chains?.[0].id.toString()
+            if (_chainId) {
+              const providerNetwork = ethers.providers.getNetwork(parseInt(_chainId, 16))
+              const chainIdHex = decToHex(providerNetwork.chainId)
+              setChainId(chainIdHex)
+              setIsConnected(true)
+
+              if (chainIdHex === NETWORK.chainId) {
+                const provider = getProvider(wallets[0])
+                const signer = provider.getSigner()
+                connectContracts(signer)
+                setIsValidNetwork(true)
+              } else {
+                setIsValidNetwork(false)
+                setWeb3Error('account_invalid_network')
+                switchOrCreateNetwork()
+              }
+            }
+          }
+        }
+      })
+      .catch((e) => {
+        console.error({ e })
+      })
+  }, [web3Onboard, chainId]) //eslint-disable-line react-hooks/exhaustive-deps
+  */
+
+  const _wallets = useWallets()
+  const connectWallet = async () => {
+    try {
+      // console.log('connectWallet', initWeb3Onboard)
+
+      /*
+      let _onboard = web3Onboard
+      if (!_onboard) {
+        console.log('connectWallet called initWeb3Onboard 1')
+        _onboard = await initWeb3Onboard()
+        setWeb3Onboard(_onboard)
+        console.log('connectWallet called initWeb3Onboard 2', _onboard)
+      }
+
+      console.log('connectWallet called initWeb3Onboard 3', _onboard, web3Onboard)
+      const wallets = await _onboard.connectWallet()
+      console.log('connectWallet called initWeb3Onboard 4')
+      */
+
+      const _wallets = await web3Onboard.connectWallet()
+      if (_wallets) {
+        console.log('connectWallet called initWeb3Onboard 5')
+        setWallets(_wallets)
+        console.log(_wallets)
+        if (_wallets[0]) {
+          setWalletAddress(_wallets[0].accounts[0].address)
+          const _chainId = _wallets[0]?.chains?.[0].id.toString()
+
+          if (_chainId) {
+            const providerNetwork = ethers.providers.getNetwork(parseInt(_chainId, 16))
+            const chainIdHex = decToHex(providerNetwork.chainId)
+            setChainId(chainIdHex)
+            setIsConnected(true)
+
+            if (chainIdHex === NETWORK.chainId) {
+              const provider = getProvider(_wallets[0])
+              const signer = provider.getSigner()
+              connectContracts(signer)
+              setIsValidNetwork(true)
+            } else {
+              setIsValidNetwork(false)
+              setWeb3Error('account_invalid_network')
+              await switchOrCreateNetwork()
+            }
+          }
         }
       }
+    } catch (error) {
+      console.error('x')
+      console.error({ error })
     }
-
-    const _web3Modal = new Web3Modal({
-      network: NETWORK.chainName,
-      cacheProvider: true,
-      providerOptions
-    })
-
-    setWeb3Modal(_web3Modal)
-
-    let web3Provider
-    let accountAddress
-    try {
-      const connection = await _web3Modal.connect()
-      web3Provider = new ethers.providers.Web3Provider(connection)
-      if (!web3Provider) return
-
-      const _wallets = await web3Provider.listAccounts()
-      const _chainId = (await web3Provider.getNetwork()).chainId
-
-      setWallets(_wallets)
-      accountAddress = await web3Provider.getSigner().getAddress()
-      setWalletAddress(accountAddress)
-
-      const chainIdHex = decToHex(_chainId)
-      setChainId(chainIdHex)
-      setIsConnected(true)
-
-      if (chainIdHex === NETWORK.chainId) {
-        connectContracts(web3Provider.getSigner())
-        setIsValidNetwork(true)
-      } else {
-        setIsValidNetwork(false)
-        setWeb3Error('account_invalid_network')
-        await switchOrCreateNetwork()
-      }
-      return [web3Provider, accountAddress]
-    } catch (e) {
-      console.error({ e })
-    }
-  }
-
-  async function connectWallet() {
-    try {
-      if (window.ethereum !== undefined) {
-        setWeb3Error('')
-        await requestAccount()
-      } else {
-        setWeb3Error('account_no_metamask')
-      }
-    } catch (ex) {
-      console.error(ex)
-    }
-  }
+  } // , [web3Onboard, chainId, wallets, languageSetted]) //eslint-disable-line react-hooks/exhaustive-deps
 
   function connectContracts(_signer) {
     try {
@@ -195,28 +331,29 @@ function Web3ContextProvider({ children }) {
     }
   }
 
-  async function disconnectWallet() {
-    if (web3Modal) await web3Modal.clearCachedProvider()
+  const disconnectWallet = useCallback(() => {
+    if (web3Onboard) {
+      web3Onboard.walletReset
+    }
     setWallets(null)
     setWalletAddress(null)
     setChainId(null)
     setIsValidNetwork(false)
     setIsConnected(false)
     setWeb3Error('')
-  }
+  }, [web3Onboard])
 
   function decToHex(number) {
     return `0x${parseInt(number).toString(16)}`
   }
 
-  async function switchOrCreateNetwork() {
+  const switchOrCreateNetwork = useCallback(async () => {
     if (window && window.ethereum) {
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: NETWORK.chainId }]
         })
-        setIsValidNetwork(true)
       } catch (error) {
         if (error.code === 4902) {
           try {
@@ -246,7 +383,7 @@ function Web3ContextProvider({ children }) {
     } else {
       console.error('Metamask or compatible wallet not installed')
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (window && typeof window.ethereum === 'undefined') {
@@ -275,7 +412,7 @@ function Web3ContextProvider({ children }) {
         }
       })
     }
-  }, [])
+  }, []) //eslint-disable-line react-hooks/exhaustive-deps
 
   const value = {
     chainId,
