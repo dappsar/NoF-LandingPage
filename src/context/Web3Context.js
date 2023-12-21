@@ -24,8 +24,8 @@ import esLocales from '../../public/locales/es/web3_onboard.json'
 
 import { NotificationContext } from './NotificationContext'
 import { getAccountAddressText } from '../utils/stringUtils'
-// import { initWeb3Onboard } from './ web3Onboard'
-import useWeb3Onboard from './useWeb3Onboard'
+import { initWeb3Onboard } from './ web3Onboard'
+// import useWeb3Onboard from './useWeb3Onboard'
 
 //----------------------------------------------------------
 
@@ -54,7 +54,7 @@ const Web3ContextProvider = ({ children }) => {
   const { languageSetted } = useSettingsContext()
   let updateLocale = () => {}
 
-  const { web3Onboard } = useWeb3Onboard()
+  // const { web3Onboard } = null // useWeb3Onboard()
 
   /*
   const initWeb3Onboard = async () => {
@@ -183,12 +183,12 @@ const Web3ContextProvider = ({ children }) => {
     }
   }
 
-  /*
+  
   const connectWallet = useCallback(() => {
     // const updateLocale = useSetLocale()
     // updateLocale(languageSetted || 'en')
 
-    web3Onboard
+    initWeb3Onboard
       .connectWallet()
       .then((wallets) => {
         if (wallets) {
@@ -219,12 +219,13 @@ const Web3ContextProvider = ({ children }) => {
       .catch((e) => {
         console.error({ e })
       })
-  }, [web3Onboard, chainId]) //eslint-disable-line react-hooks/exhaustive-deps
-  */
+  }, [initWeb3Onboard, chainId]) //eslint-disable-line react-hooks/exhaustive-deps
+  
 
-  const _wallets = useWallets()
-  const connectWallet = async () => {
-    try {
+  // const _wallets = useWallets()
+
+  const connectWallet2 = async () => {
+    // try {
       // console.log('connectWallet', initWeb3Onboard)
 
       /*
@@ -240,8 +241,9 @@ const Web3ContextProvider = ({ children }) => {
       const wallets = await _onboard.connectWallet()
       console.log('connectWallet called initWeb3Onboard 4')
       */
-
-      const _wallets = await web3Onboard.connectWallet()
+     /*
+      if (!web3Onboard) return
+      const _wallets = null // await web3Onboard.connectWallet()
       if (_wallets) {
         console.log('connectWallet called initWeb3Onboard 5')
         setWallets(_wallets)
@@ -273,6 +275,7 @@ const Web3ContextProvider = ({ children }) => {
       console.error('x')
       console.error({ error })
     }
+    */
   } // , [web3Onboard, chainId, wallets, languageSetted]) //eslint-disable-line react-hooks/exhaustive-deps
 
   function connectContracts(_signer) {
@@ -332,8 +335,8 @@ const Web3ContextProvider = ({ children }) => {
   }
 
   const disconnectWallet = useCallback(() => {
-    if (web3Onboard) {
-      web3Onboard.walletReset
+    if (initWeb3Onboard) {
+      initWeb3Onboard.walletReset
     }
     setWallets(null)
     setWalletAddress(null)
@@ -341,7 +344,7 @@ const Web3ContextProvider = ({ children }) => {
     setIsValidNetwork(false)
     setIsConnected(false)
     setWeb3Error('')
-  }, [web3Onboard])
+  }, [initWeb3Onboard])
 
   function decToHex(number) {
     return `0x${parseInt(number).toString(16)}`

@@ -41,7 +41,7 @@ const useWeb3Onboard = () => {
       const coinbase = coinbaseModule()
       const gnosis = gnosisModule({ whitelistedDomains: [] })
 
-      const onboard = init({
+      const onboard = await init({
         wallets: [injected, walletConnect, gnosis, coinbase, trust],
         connect: {
           showSidebar: true,

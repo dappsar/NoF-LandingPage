@@ -3,7 +3,8 @@ import trustModule from '@web3-onboard/trust'
 import gnosisModule from '@web3-onboard/gnosis'
 import walletConnectModule from '@web3-onboard/walletconnect'
 import injectedModule, { ProviderLabel } from '@web3-onboard/injected-wallets'
-import { init } from '@web3-onboard/react'
+// import { init } from '@web3-onboard/react'
+import Onboard from "@web3-onboard/core"
 
 import { NETWORK, WalletConnectProjectId } from '../config'
 
@@ -50,7 +51,8 @@ const gnosis = gnosisModule({
 })
 console.log('initWeb3Onboard 8')
 
-export const initWeb3Onboard = init({
+// export const initWeb3Onboard = init({
+export const initWeb3Onboard = Onboard({
   wallets: [injected, walletConnect, gnosis, coinbase, trust],
   connect: {
     showSidebar: true,
