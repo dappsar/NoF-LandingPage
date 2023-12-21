@@ -42,7 +42,8 @@ const GammaMain = () => {
     connectWallet,
     switchOrCreateNetwork,
     isConnected,
-    isValidNetwork
+    isValidNetwork,
+    open
   } = useWeb3Context()
   const {
     startLoading,

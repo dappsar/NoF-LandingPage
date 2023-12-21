@@ -1,3 +1,4 @@
+// use web3Modal deprecated
 import { useState, useEffect, createContext, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { ethers } from 'ethers'
@@ -40,6 +41,7 @@ function Web3ContextProvider({ children }) {
   async function requestAccount() {
     const providerOptions = {
       injected: {
+        package: null,
         display: {
           description: ' '
         }
@@ -65,11 +67,12 @@ function Web3ContextProvider({ children }) {
           description: ' '
         },
         options: {
-          version: 2,
-          clientId: WalletConnectProjectId,
+          // version: 2,
+          // clientId: WalletConnectProjectId,
           rpc: {
             [parseInt(NETWORK.chainId, 16)]: NETWORK.chainNodeProviderUrl
-          }
+          },
+          network: NETWORK.chainName
           /*{
           version: 1,
           qrcodeModalOptions: {

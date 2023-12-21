@@ -1,3 +1,4 @@
+// use web3-onboard component
 import { useConnectWallet, useSetChain, useSetLocale, useWallets, init } from '@web3-onboard/react'
 import { createContext, useState, useEffect, useContext, useCallback } from 'react'
 import PropTypes from 'prop-types'
