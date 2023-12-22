@@ -50,7 +50,7 @@ function Web3ContextProvider({ children }) {
     name: NETWORK.chainName,
     currency: NETWORK.chainCurrency,
     explorerUrl: NETWORK.chainExplorerUrl,
-    rpcUrl: NETWORK.ChainRpcUrl
+    rpcUrl: 'https://cloudflare-eth.com' // NETWORK.ChainRpcUrl
   }
 
   // 3. Create modal
@@ -58,20 +58,27 @@ function Web3ContextProvider({ children }) {
     name: 'NoF',
     description: 'Number One Fun',
     url: 'https://nof.town',
-    icons: ['https://avatars.mywebsite.com/']
+    icons: ['https://avatars.githubusercontent.com/u/37784886']
   }
 
+  console.log('projectId', WalletConnectProjectId, parseInt(NETWORK.chainId, 10))
   createWeb3Modal({
     ethersConfig: defaultConfig({
       metadata,
       defaultChainId: parseInt(NETWORK.chainId, 10),
-      enableEIP6963: true,
-      enableInjected: true,
-      enableCoinbase: true,
-      rpcUrl: NETWORK.chainNodeProviderUrl
+      // enableEIP6963: true,
+      // enableInjected: true,
+      // enableCoinbase: true,
+      rpcUrl: 'https://cloudflare-eth.com' // NETWORK.chainNodeProviderUrl
     }),
     chains: [mumbai],
-    projectId: WalletConnectProjectId
+    projectId: WalletConnectProjectId,
+    enableAnalytics: true,
+    themeMode: 'light',
+    themeVariables: {
+      '--w3m-color-mix': '#00DCFF',
+      '--w3m-color-mix-strength': 20
+    }
   })
   const { open } = useWeb3Modal()
 

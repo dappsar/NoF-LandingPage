@@ -14,6 +14,7 @@ import gammaOffersAbi from './abis/GammaOffers.v4.sol/NofGammaOffersV4.json'
 import { CONTRACTS, NETWORK, WalletConnectProjectId } from '../config'
 import { NotificationContext } from './NotificationContext'
 import { getAccountAddressText } from '../utils/stringUtils'
+import EthereumProvider from '@walletconnect/ethereum-provider'
 
 const initialState = {
   connectWallet: () => {},
@@ -39,6 +40,20 @@ function Web3ContextProvider({ children }) {
   const { addNotification } = useContext(NotificationContext)
 
   async function requestAccount() {
+    const wcV1InitOptions = {
+      version: 1,
+      bridge: 'https://bridge.walletconnect.org',
+      qrcodeModalOptions: {
+        mobileLinks: ['metamask', 'argent', 'trust']
+      },
+      connectFirstChainId: true
+    }
+    
+    const wcV2InitOptions = {
+      version: 2,
+      projectId: WalletConnectProjectId || ''
+    }
+
     const providerOptions = {
       injected: {
         package: null,
@@ -62,17 +77,21 @@ function Web3ContextProvider({ children }) {
         }
       },
       walletconnect: {
-        package: WalletConnectProvider,
+        package: EthereumProvider,
         display: {
           description: ' '
         },
-        options: {
+        options: wcV2InitOptions || wcV1InitOptions
+        
+        //{
           // version: 2,
           // clientId: WalletConnectProjectId,
+          /*
           rpc: {
             [parseInt(NETWORK.chainId, 16)]: NETWORK.chainNodeProviderUrl
           },
           network: NETWORK.chainName
+          */
           /*{
           version: 1,
           qrcodeModalOptions: {
@@ -82,7 +101,7 @@ function Web3ContextProvider({ children }) {
             [parseInt(NETWORK.chainId, 16)]: NETWORK.chainNodeProviderUrl
           }
           }  */
-        }
+        //}
       }
     }
 
