@@ -25,6 +25,10 @@ import { NETWORK } from '../../config'
 
 import { useWeb3Context, useLayoutContext, useGammaDataContext } from '../../hooks'
 
+import { initWeb3Onboard } from '../../context/ web3Onboard'
+
+
+
 const GammaMain = () => {
   const { t } = useTranslation()
   const [openPackCardsNumbers, setOpenPackCardsNumbers] = useState([])
@@ -60,6 +64,9 @@ const GammaMain = () => {
 
   const canCompleteAlbum120 = () => cardsQtty >= 120 && albums120Qtty > 0
 
+
+
+  
   const getCardsQtty = (_userdata) => {
     let total = 0
     if (!_userdata) return
@@ -512,7 +519,7 @@ const GammaMain = () => {
           <button
             className='alpha_button alpha_main_button'
             id='connect_wallet_button'
-            onClick={() => connectWallet()}
+            onClick={() => connectWallet(initWeb3Onboard)}
           >
             {t('connect_wallet')}
           </button>

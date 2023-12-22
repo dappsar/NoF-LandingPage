@@ -24,7 +24,7 @@ import esLocales from '../../public/locales/es/web3_onboard.json'
 
 import { NotificationContext } from './NotificationContext'
 import { getAccountAddressText } from '../utils/stringUtils'
-import { initWeb3Onboard } from './ web3Onboard'
+// import { initWeb3Onboard } from './ web3Onboard'
 // import useWeb3Onboard from './useWeb3Onboard'
 
 //----------------------------------------------------------
@@ -183,12 +183,11 @@ const Web3ContextProvider = ({ children }) => {
     }
   }
 
-  
-  const connectWallet = useCallback(() => {
+  const connectWallet = useCallback((web3Onboard) => {
     // const updateLocale = useSetLocale()
     // updateLocale(languageSetted || 'en')
 
-    initWeb3Onboard
+    web3Onboard
       .connectWallet()
       .then((wallets) => {
         if (wallets) {
@@ -219,16 +218,14 @@ const Web3ContextProvider = ({ children }) => {
       .catch((e) => {
         console.error({ e })
       })
-  }, [initWeb3Onboard, chainId]) //eslint-disable-line react-hooks/exhaustive-deps
-  
+  }, [chainId]) //eslint-disable-line react-hooks/exhaustive-deps
 
   // const _wallets = useWallets()
 
   const connectWallet2 = async () => {
     // try {
-      // console.log('connectWallet', initWeb3Onboard)
-
-      /*
+    // console.log('connectWallet', initWeb3Onboard)
+    /*
       let _onboard = web3Onboard
       if (!_onboard) {
         console.log('connectWallet called initWeb3Onboard 1')
@@ -241,7 +238,7 @@ const Web3ContextProvider = ({ children }) => {
       const wallets = await _onboard.connectWallet()
       console.log('connectWallet called initWeb3Onboard 4')
       */
-     /*
+    /*
       if (!web3Onboard) return
       const _wallets = null // await web3Onboard.connectWallet()
       if (_wallets) {
@@ -334,7 +331,7 @@ const Web3ContextProvider = ({ children }) => {
     }
   }
 
-  const disconnectWallet = useCallback(() => {
+  const disconnectWallet = useCallback((initWeb3Onboard) => {
     if (initWeb3Onboard) {
       initWeb3Onboard.walletReset
     }
@@ -344,7 +341,7 @@ const Web3ContextProvider = ({ children }) => {
     setIsValidNetwork(false)
     setIsConnected(false)
     setWeb3Error('')
-  }, [initWeb3Onboard])
+  }, [])
 
   function decToHex(number) {
     return `0x${parseInt(number).toString(16)}`

@@ -4,7 +4,7 @@ import gnosisModule from '@web3-onboard/gnosis'
 import walletConnectModule from '@web3-onboard/walletconnect'
 import injectedModule, { ProviderLabel } from '@web3-onboard/injected-wallets'
 // import { init } from '@web3-onboard/react'
-import Onboard from "@web3-onboard/core"
+import Onboard from '@web3-onboard/core'
 
 import { NETWORK, WalletConnectProjectId } from '../config'
 
