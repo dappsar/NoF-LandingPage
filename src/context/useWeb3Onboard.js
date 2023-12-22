@@ -1,3 +1,4 @@
+/*
 import { useEffect, useState } from 'react'
 import { init } from '@web3-onboard/react'
 import coinbaseModule from '@web3-onboard/coinbase'
@@ -81,3 +82,4 @@ const useWeb3Onboard = () => {
 }
 
 export default useWeb3Onboard
+*/

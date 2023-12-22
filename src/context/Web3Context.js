@@ -183,42 +183,45 @@ const Web3ContextProvider = ({ children }) => {
     }
   }
 
-  const connectWallet = useCallback((web3Onboard) => {
-    // const updateLocale = useSetLocale()
-    // updateLocale(languageSetted || 'en')
+  const connectWallet = useCallback(
+    (web3Onboard) => {
+      // const updateLocale = useSetLocale()
+      // updateLocale(languageSetted || 'en')
 
-    web3Onboard
-      .connectWallet()
-      .then((wallets) => {
-        if (wallets) {
-          setWallets(wallets)
-          if (wallets[0]) {
-            setWalletAddress(wallets[0].accounts[0].address)
-            const _chainId = wallets[0]?.chains?.[0].id.toString()
-            if (_chainId) {
-              const providerNetwork = ethers.providers.getNetwork(parseInt(_chainId, 16))
-              const chainIdHex = decToHex(providerNetwork.chainId)
-              setChainId(chainIdHex)
-              setIsConnected(true)
+      web3Onboard
+        .connectWallet()
+        .then((wallets) => {
+          if (wallets) {
+            setWallets(wallets)
+            if (wallets[0]) {
+              setWalletAddress(wallets[0].accounts[0].address)
+              const _chainId = wallets[0]?.chains?.[0].id.toString()
+              if (_chainId) {
+                const providerNetwork = ethers.providers.getNetwork(parseInt(_chainId, 16))
+                const chainIdHex = decToHex(providerNetwork.chainId)
+                setChainId(chainIdHex)
+                setIsConnected(true)
 
-              if (chainIdHex === NETWORK.chainId) {
-                const provider = getProvider(wallets[0])
-                const signer = provider.getSigner()
-                connectContracts(signer)
-                setIsValidNetwork(true)
-              } else {
-                setIsValidNetwork(false)
-                setWeb3Error('account_invalid_network')
-                switchOrCreateNetwork()
+                if (chainIdHex === NETWORK.chainId) {
+                  const provider = getProvider(wallets[0])
+                  const signer = provider.getSigner()
+                  connectContracts(signer)
+                  setIsValidNetwork(true)
+                } else {
+                  setIsValidNetwork(false)
+                  setWeb3Error('account_invalid_network')
+                  switchOrCreateNetwork()
+                }
               }
             }
           }
-        }
-      })
-      .catch((e) => {
-        console.error({ e })
-      })
-  }, [chainId]) //eslint-disable-line react-hooks/exhaustive-deps
+        })
+        .catch((e) => {
+          console.error({ e })
+        })
+    },
+    [chainId]
+  ) //eslint-disable-line react-hooks/exhaustive-deps
 
   // const _wallets = useWallets()
 

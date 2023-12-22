@@ -27,7 +27,8 @@ import { useWeb3Context, useLayoutContext, useGammaDataContext } from '../../hoo
 
 import { initWeb3Onboard } from '../../context/ web3Onboard'
 
-
+import { init, useConnectWallet } from '@web3-onboard/react'
+import injectedModule from '@web3-onboard/injected-wallets'
 
 const GammaMain = () => {
   const { t } = useTranslation()
@@ -64,9 +65,6 @@ const GammaMain = () => {
 
   const canCompleteAlbum120 = () => cardsQtty >= 120 && albums120Qtty > 0
 
-
-
-  
   const getCardsQtty = (_userdata) => {
     let total = 0
     if (!_userdata) return
