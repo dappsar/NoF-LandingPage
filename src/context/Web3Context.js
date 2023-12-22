@@ -50,7 +50,7 @@ function Web3ContextProvider({ children }) {
     name: NETWORK.chainName,
     currency: NETWORK.chainCurrency,
     explorerUrl: NETWORK.chainExplorerUrl,
-    rpcUrl: 'https://cloudflare-eth.com' // NETWORK.ChainRpcUrl
+    rpcUrl: NETWORK.ChainRpcUrl
   }
 
   // 3. Create modal
@@ -69,7 +69,7 @@ function Web3ContextProvider({ children }) {
       // enableEIP6963: true,
       // enableInjected: true,
       // enableCoinbase: true,
-      rpcUrl: 'https://cloudflare-eth.com' // NETWORK.chainNodeProviderUrl
+      rpcUrl: NETWORK.ChainRpcUrl
     }),
     chains: [mumbai],
     projectId: WalletConnectProjectId,
