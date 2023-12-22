@@ -13,6 +13,7 @@ $groundHeight: 40px;
 
 .hero,
 .alpha,
+.offline,
 .gamma_main {
   height: 87.5vh;
   background-image: url('/images/hero/NofCaballero.gif'), url('/images/hero/front1.png'),
@@ -486,9 +487,9 @@ $groundHeight: 40px;
 
     &__album__gamma {
       @extend .hero__top__album;
-      background-image: url('/images/gamma/GammaFondo.png') !important;
+      background-image: url('/images/gamma/GammaFondo2.png') !important;
       @include mobile {
-        background-image: url('/images/gamma/GammaFondo-libreta.png') !important;
+        background-image: url('/images/gamma/GammaFondo-libreta2.png') !important;
       }
     }
   }

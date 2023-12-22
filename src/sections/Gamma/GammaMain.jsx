@@ -13,7 +13,6 @@ import GammaPackOpen from './GammaPackOpen'
 import { checkApproved, authorizeDaiContract } from '../../services/dai'
 import { fetchPackData } from '../../services/gamma'
 import {
-  getCardsByUser,
   checkPacksByUser,
   finishAlbum,
   openPack,
@@ -23,8 +22,7 @@ import {
   getUserAlbums120Qtty
 } from '../../services/gamma'
 
-import { useWeb3Context } from '../../hooks'
-import { useLayoutContext } from '../../hooks'
+import { useWeb3Context, useLayoutContext, useGammaDataContext } from '../../hooks'
 
 const GammaMain = () => {
   const { t } = useTranslation()
@@ -33,6 +31,7 @@ const GammaMain = () => {
   const [openPackage, setOpenPackage] = useState(false)
   const [inventory, setInventory] = useState(true)
   const [packIsOpen, setPackIsOpen] = useState(false)
+  const { paginationObj, refreshPaginationObj } = useGammaDataContext()
   const {
     walletAddress,
     daiContract,
@@ -49,19 +48,23 @@ const GammaMain = () => {
     updateButtonFunctions,
     updateFooterButtonsClasses
   } = useLayoutContext()
-  const [paginationObj, setPaginationObj] = useState({})
   const [cardsQtty, setCardsQtty] = useState(0)
   const [albums120Qtty, setAlbums120Qtty] = useState(0)
   const [showRules, setShowRules] = useState(false)
   const [cardInfoOpened, setCardInfoOpened] = useState(false)
+  const [albumInfoOpened, setAlbumInfoOpened] = useState(false)
 
   const canCompleteAlbum120 = () => cardsQtty >= 120 && albums120Qtty > 0
 
-  const getCardsQtty = (paginationObj) => {
+  const getCardsQtty = (_userdata) => {
     let total = 0
-    if (!paginationObj) return
-    for (let key in paginationObj.user) {
-      if (paginationObj.user[key].quantity > 0) {
+    if (!_userdata) return
+    for (let key in _userdata.user) {
+      if (
+        _userdata.user[key].quantity > 0 &&
+        _userdata.user[key].name != 120 &&
+        _userdata.user[key].name != 121
+      ) {
         total += 1
       }
     }
@@ -78,15 +81,16 @@ const GammaMain = () => {
   }
 
   const updateUserData = async () => {
-    const userCards = await getCardsByUser(gammaCardsContract, walletAddress)
-    setPaginationObj(userCards)
+    refreshPaginationObj()
+    // TODO :ver de optimizar, no hace falta llamar al contrato, ya queda en paginationObj
     const userAlbums120 = await getUserAlbums120Qtty(gammaCardsContract, walletAddress)
     setAlbums120Qtty(userAlbums120)
-    setCardsQtty(getCardsQtty(userCards))
+    setCardsQtty(getCardsQtty(paginationObj))
   }
 
   const fetchInventory = async () => {
     try {
+      if (!walletAddress) return
       startLoading()
       await updateUserData()
       stopLoading()
@@ -101,7 +105,6 @@ const GammaMain = () => {
   }, [paginationObj]) //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!walletAddress) return
     fetchInventory()
   }, [walletAddress, gammaCardsContract]) //eslint-disable-line react-hooks/exhaustive-deps
 
@@ -111,13 +114,13 @@ const GammaMain = () => {
   }, [walletAddress, gammaPacksContract]) //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (walletAddress && !cardInfoOpened) {
+    if (walletAddress && !cardInfoOpened && !albumInfoOpened) {
       ToggleShowDefaultButtons(false)
 
       if (inventory) {
         updateShowButtons([true, true, true, true])
         updateFooterButtonsClasses([
-          'footer__buttons__bluebtn_custom_switch_inventory',
+          'footer__buttons__bluebtn_custom_switch_album',
           'footer__buttons__greenbtn_custom_shop',
           'footer__buttons__redbtn_custom_open',
           'footer__buttons__yellowbtn_custom_transfer'
@@ -125,7 +128,7 @@ const GammaMain = () => {
       } else {
         updateShowButtons([true, true, false, false])
         updateFooterButtonsClasses([
-          'footer__buttons__bluebtn_custom_switch_album',
+          'footer__buttons__bluebtn_custom_switch_inventory',
           'footer__buttons__greenbtn_custom_claim',
           null,
           null
@@ -134,18 +137,18 @@ const GammaMain = () => {
 
       updateButtonFunctions(0, handleSwitchBook)
     }
-  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened, albumInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (walletAddress && !cardInfoOpened) {
+    if (walletAddress && !cardInfoOpened && !albumInfoOpened) {
       if (inventory) updateButtonFunctions(1, handleBuyPack)
       else updateButtonFunctions(1, handleFinishAlbum)
     }
-  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened, albumInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(
     () => {
-      if (walletAddress && inventory && !cardInfoOpened) {
+      if (walletAddress && inventory && !cardInfoOpened && !albumInfoOpened) {
         updateButtonFunctions(2, handleOpenPack)
       }
     },
@@ -158,7 +161,8 @@ const GammaMain = () => {
     cardsQtty,
     numberOfPacks,
     inventory,
-    cardInfoOpened
+    cardInfoOpened,
+    albumInfoOpened
   ]
   )
 
@@ -166,7 +170,7 @@ const GammaMain = () => {
     if (walletAddress && inventory) {
       updateButtonFunctions(3, handleTransferPack)
     }
-  }, [walletAddress, gammaPacksContract, numberOfPacks, inventory, cardInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, gammaPacksContract, numberOfPacks, inventory, cardInfoOpened, albumInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFinishAlbum = useCallback(
     async () => {
@@ -203,6 +207,7 @@ const GammaMain = () => {
     paginationObj,
     inventory,
     cardInfoOpened,
+    albumInfoOpened,
     cardsQtty,
     albums120Qtty
   ]
@@ -293,7 +298,7 @@ const GammaMain = () => {
       console.error({ ex })
       emitError(t('transfer_pack_error'))
     }
-  }, [walletAddress, gammaPacksContract, numberOfPacks, inventory, cardInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, gammaPacksContract, numberOfPacks, inventory, cardInfoOpened, albumInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpenPack = useCallback(
     async () => {
@@ -414,19 +419,12 @@ const GammaMain = () => {
     cardsQtty,
     numberOfPacks,
     inventory,
-    cardInfoOpened]
+    cardInfoOpened,
+    albumInfoOpened
+  ]
   )
 
   const buyPacksContract = async (numberOfPacks) => {
-    /*
-    gammaPacksContract.on('PacksPurchase', (returnValue, theEvent) => {
-      for (let i = 0; i < theEvent.length; i++) {
-        const pack_number = ethers.BigNumber.from(theEvent[i]).toNumber()
-        // console.log('PacksPurchase', pack_number)
-      }
-    })
-    */
-
     try {
       startLoading()
 
@@ -469,6 +467,7 @@ const GammaMain = () => {
 
   const handleSwitchBook = useCallback(async () => {
     setCardInfoOpened(false)
+    setAlbumInfoOpened(false)
     setInventory(!inventory)
   }, [inventory])
 
@@ -505,7 +504,7 @@ const GammaMain = () => {
       const packsToBuy = result.value
       await buyPacksContract(packsToBuy)
     }
-  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
+  }, [walletAddress, gammaPacksContract, inventory, cardInfoOpened, albumInfoOpened]) //eslint-disable-line react-hooks/exhaustive-deps
 
   const NotConnected = () => (
     <div className='alpha'>
@@ -548,9 +547,9 @@ const GammaMain = () => {
               </>
             )}
             <div className='gammapack__actions'>
-              {numberOfPacks === 0 || cardInfoOpened ? (
+              {numberOfPacks === 0 || cardInfoOpened || albumInfoOpened ? (
                 <>
-                  {cardInfoOpened ? (
+                  {cardInfoOpened || albumInfoOpened ? (
                     <div className={'gammapack__actions__buyPack_disabled'}>
                       <Image
                         src={'/images/gamma/buyPackOff.png'}
@@ -675,7 +674,7 @@ const GammaMain = () => {
         handleSwitchBook()
       }}
       className={
-        cardInfoOpened
+        cardInfoOpened || albumInfoOpened
           ? inventory
             ? 'gammaAlbums-disabled'
             : 'gammaAlbums2-disabled'
@@ -708,7 +707,7 @@ const GammaMain = () => {
           showInventory={inventory}
           updateUserData={updateUserData}
           setCardInfoOpened={setCardInfoOpened}
-          paginationObj={paginationObj}
+          setAlbumInfoOpened={setAlbumInfoOpened}
         />
       )}
 
