@@ -32,27 +32,27 @@ export const NETWORK = {
     process.env.NEXT_PUBLIC_CHAIN_EXPLORER_URL ||
     (is_production ? 'https://polygonscan.com' : 'https://mumbai.polygonscan.com'),
   chainNodeProviderUrl:
-    process.env.NEXT_PUBLIC_CHAIN_NODE_PROVIDER_URL ||
-    'https://polygon-mumbai.g.alchemy.com/v2/6Ge-klr1O_0kD4ZUSAFffyC7QNNEOJZJ'
+    process.env.NEXT_PUBLIC_CHAIN_NODE_PROVIDER_URL || 'https://polygon-mumbai.g.alchemy.com/v2/'
 }
 
-export const WalletConnectProjectId =
-  process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'd66ff03f26d5a3ef19530ba69b815448'
+export const WalletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || ''
 
 export const CONTRACTS = {
   daiAddress: process.env.NEXT_PUBLIC_DAI_ADDRESS || '0xEa4c35c858E15Cef77821278A88435dE57bc8707',
   alphaAddress:
-    process.env.NEXT_PUBLIC_ALPHA_ADDRESS || '0x37Ee2C0768c047A3b4892613007b3eaE217411f4',
-  gammaPackAddress:
-    process.env.NEXT_PUBLIC_GAMMA_PACKS_ADDRESS || '0x1F69307e85463fd0Fe2Db048Be932BE5f263d485',
+    process.env.NEXT_PUBLIC_ALPHA_ADDRESS || '0x7C201e88e43b5FBEEfB77F966c2a5D2E09178B49',
   gammaCardsAddress:
-    process.env.NEXT_PUBLIC_GAMMA_CARDS_ADDRESS || '0xa58eF78A16b7c6300DdaE0e26e96AcaF2eC39b4f',
+    process.env.NEXT_PUBLIC_GAMMA_CARDS_ADDRESS || '0x34658c07F05638E12793d0961595cBc72fA69452',
+  gammaPackAddress:
+    process.env.NEXT_PUBLIC_GAMMA_PACKS_ADDRESS || '0xDc06FbD70b2159863d079aE282d69AEe8a88A18E',
   gammaOffersAddress:
-    process.env.NEXT_PUBLIC_GAMMA_OFFERS_ADDRESS || '0xD46EC7D15B9cd30C86668200cC9f7307E2aB9331'
+    process.env.NEXT_PUBLIC_GAMMA_OFFERS_ADDRESS || '0x3Da346C40A0D90cf5642944613586439A3456d45',
+  gammaTicketsAddress:
+    process.env.NEXT_PUBLIC_GAMMA_TICKETS_ADDRESS || '0x7593aad3e13fBd27F113aad8688E8817Ac4f9A33'
 }
 
 export const openSeaUrlAlpha = is_production
-  ? `https://.opensea.io/assets/matic/${CONTRACTS.alphaAddress}`
+  ? `https://opensea.io/assets/matic/${CONTRACTS.alphaAddress}`
   : `https://testnets.opensea.io/assets/mumbai/${CONTRACTS.alphaAddress}`
 
 export const openSeaUrlGamma = is_production
@@ -69,5 +69,26 @@ export const defaultSettings = {
   languageSetted: 'es'
 }
 
-console.info('Network and Contracts', NETWORK, CONTRACTS)
+export const MAIL_CONFIG = {
+  client: process.env.MAIL_CLIENT || 'ethereal',
+  from: process.env.MAIL_FROM || 'no-reply@nof.town',
+  to: process.env.MAIL_TO || 'dapps.ar@gmail.com',
+  sg_key: process.env.MAIL_SG_KEY,
+  sg_from: process.env.MAIL_SG_FROM || 'no-reply@nof.town',
+  ethereal_host: process.env.MAIL_ETHEREAL_HOST || 'smtp.ethereal.email',
+  ethereal_port: process.env.MAIL_ETHEREAL_PORT || 587,
+  ethereal_user: process.env.MAIL_ETHEREAL_USER,
+  ethereal_pswd: process.env.MAIL_ETHEREAL_PSWD
+}
+
+export const MAIL_TYPE = {
+  reportError: 'REPORT_ERROR'
+}
+
+export const MAIL_CLIENT = {
+  sendgrid: 'sendgrid',
+  ethereal: 'ethereal'
+}
+
+console.info('Network and Contracts', NETWORK, CONTRACTS, WalletConnectProjectId)
 // ------------------------------------------------------------------
